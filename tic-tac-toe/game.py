@@ -32,3 +32,5 @@ class Game:
                 self.board.display()
                 if self.board.has_winner():
                     return "{} wins!".format(tokens[i])
+                if not self.board.get_valid_moves():
+                    return "draw."
