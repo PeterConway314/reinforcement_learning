@@ -3,6 +3,14 @@ import os
 
 tokens = ["O", "X"]
 
+def clear_screen():
+    # Clear command for Windows
+    if os.name == 'nt':
+        os.system('cls')
+    # Clear command for Unix-like systems (Linux, macOS)
+    else:
+        os.system('clear')
+
 class Game:
     def __init__(self, board, agent1, agent2):
         self.board = board
@@ -20,7 +28,7 @@ class Game:
             for i, agent in enumerate(self.turn_order):
                 move = agent.select_move(self.board.get_valid_moves())
                 self.board.register_move(tokens[i], move[0], move[1])
-                os.system('cls')
+                clear_screen()
                 self.board.display()
                 if self.board.has_winner():
                     return "{} wins!".format(tokens[i])
