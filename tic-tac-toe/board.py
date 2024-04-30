@@ -55,7 +55,7 @@ class Board:
     '''
     def display(self):
         for row in range(3):
-            row_display = ""
+            row_display = "{}  ".format([2-row])
             for col in range(3):
                 # row_display += " {} ".format(display_vector(self.board[row][col]))
                 row_display += " {} ".format(display_vector(self.board[col][2-row]))
@@ -65,4 +65,7 @@ class Board:
             print(row_display)
         
             if row < 2:
-                print("-----------")
+                print("     -----------")
+            
+        print()
+        print("     [0] [1] [2]")
