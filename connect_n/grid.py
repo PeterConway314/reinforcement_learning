@@ -35,12 +35,13 @@ class Grid:
         self.xdim = xdim
         self.ydim = ydim
         self.n = n # number in row required to win
-        self.reset_grid()
-
-    def reset_grid(self):
         self.grid = np.array([[null for _ in range(self.ydim)] \
                                     for _ in range(self.xdim)])
         self.grid_counts = np.array([0 for _ in range(self.xdim)])
+
+    def reset_grid(self):
+        self.grid *= 0
+        self.grid_counts *= 0
 
     def get_valid_moves(self):
         # abs returns 1 if space is not empty
@@ -75,13 +76,13 @@ class Grid:
             # south-west to north-east wins
             list = self.grid.diagonal(i) # get diagonal
             nd = len(list) - self.n # diagonal "freedom"
-            for j in range(nd):
+            for j in range(nd+1):
                 if np.abs(np.sum(list[j:j+self.n])) == self.n:
                     return True
             # south-east to north-west wins
             list = np.flipud(self.grid).diagonal(i) # get diagonal
             nd = len(list) - self.n # diagonal "freedom"
-            for j in range(nd):
+            for j in range(nd+1):
                 if np.abs(np.sum(list[j:j+self.n])) == self.n:
                     return True
                 
@@ -115,3 +116,7 @@ class Grid:
             footer += "=="            
         footer += "="
         print(footer)
+
+    def get_state(self):
+        # returns an 1 x (xdim x ydim) vector
+        return tuple(self.grid.reshape(-1))
