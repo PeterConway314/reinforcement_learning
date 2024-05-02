@@ -58,18 +58,27 @@ class Grid:
         else:
             print("invalid move.")
 
+    def is_win(self,lst,len):
+        # determines if a list is all the same and not 0s
+        if lst[0] == 0:
+            return False
+        for i in range(1,len):
+            if lst[i] != lst[0]:
+                return False
+        return True
+
     def has_winner(self):
         # vertical wins
         nx = self.xdim - self.n + 1 # row "freedom"
         ny = self.ydim - self.n + 1 # column "freedom"
         for j in range(ny):
             for i in range(self.xdim):
-                if np.abs(np.sum(self.grid[i,j:j+self.n])) == self.n:
+                if self.is_win(self.grid[i,j:j+self.n],self.n):
                     return True
         # horizontal wins
         for j in range(self.ydim):
             for i in range(nx):
-                if np.abs(np.sum(self.grid[i:i+self.n,j])) == self.n:
+                if self.is_win(self.grid[i:i+self.n,j],self.n):
                     return True
         # diagonal wins
         for i in range(1-nx,ny):
@@ -77,15 +86,14 @@ class Grid:
             list = self.grid.diagonal(i) # get diagonal
             nd = len(list) - self.n # diagonal "freedom"
             for j in range(nd+1):
-                if np.abs(np.sum(list[j:j+self.n])) == self.n:
+                if self.is_win(list[j:j+self.n],self.n):
                     return True
             # south-east to north-west wins
             list = np.flipud(self.grid).diagonal(i) # get diagonal
             nd = len(list) - self.n # diagonal "freedom"
             for j in range(nd+1):
-                if np.abs(np.sum(list[j:j+self.n])) == self.n:
+                if self.is_win(list[j:j+self.n],self.n):
                     return True
-                
         return False
 
     def display(self):
