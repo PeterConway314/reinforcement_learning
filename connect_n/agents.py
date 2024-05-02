@@ -58,50 +58,32 @@ class BasicQAgent:
         """
         Epsilon-greedy action selection based on Q-values.
         """
-        
         if random.uniform(0, 1) < self.epsilon:
             # Exploration: Choose a random action from the available actions
             return random.choice(available_actions)
         else:
             # Exploitation: Choose the action with the highest Q-value for the current state
-            if state in self.Q_table:
-                # print(f"state exists")
-                q_values = {}
-                for action, value in self.Q_table[state].items():
-                    if action in available_actions:
-                        q_values[action] = value
-                
-                if q_values: # if q-values exist at this state
-                    # print(f"q vals: {q_values}")
-                    # x = input()
-                    return max(q_values, key=q_values.get)
-                else: # else, random choice
-                    return random.choice(available_actions)
+            q_values = self.Q_table.get(state, {})
+            q_values = {action: value for action, value in q_values.items() if action in available_actions}
+            if q_values:
+                return max(q_values, key=q_values.get)
             else:
-                # If state not in Q-table, choose a random action from the available actions
+                # If no Q-values for the state or none of the actions are available, choose randomly
                 return random.choice(available_actions)
 
     def update_q_value(self, state, action, reward, next_state):
         """
         Update Q-value based on the Q-learning update rule.
         """
-        if self.can_learn:
-            # Ensure states are in Q_table
-            if state not in self.Q_table:
-                self.Q_table[state] = {}
-            if next_state not in self.Q_table:
-                self.Q_table[next_state] = {}
+        if not self.can_learn:
+            return
 
-            # Q-learning update rule
-            if self.Q_table[next_state]: # if q-values exist at next state
-                max_next_q_value = max(self.Q_table[next_state].values())
-            else:
-                max_next_q_value = 0
-            td_target = reward + self.discount_factor * max_next_q_value
-            try:
-                td_error = td_target - self.Q_table[state][action]
-            except KeyError:
-                # If the key doesn't exist, assign a default value (e.g., 0)
-                self.Q_table[state][action] = 0
-                td_error = td_target  # Assume Q-value is 0
-            self.Q_table[state][action] += self.learning_rate * td_error
+        # Ensure states are in Q_table
+        self.Q_table.setdefault(state, {})
+        self.Q_table.setdefault(next_state, {})
+
+        # Q-learning update rule
+        max_next_q_value = max(self.Q_table[next_state].values(), default=0)
+        td_target = reward + self.discount_factor * max_next_q_value
+        td_error = td_target - self.Q_table[state].get(action, 0)
+        self.Q_table[state][action] = self.Q_table[state].get(action, 0) + self.learning_rate * td_error
