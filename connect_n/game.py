@@ -58,13 +58,13 @@ class TrainingGame(Game):
     def move_cycle(self,i,first_cycle=False):
         agent = self.agents[i] # get agent
         token = self.agent_tokens[i] # get agent token
-        self.state = self.grid.get_state() # fetch state
         if not first_cycle:
             self.update_q_value(i) # neutral q-value update
         self.prev_states[i] = self.state # save state when action was made
         action = agent.select_move(self.state, self.grid.get_valid_moves())
         self.recent_actions[i] = action # save action made
         self.grid.register_move(token, action) # do action
+        self.state = self.grid.get_state() # get updated state
 
     def train(self):
         self.randomise_start() # randomise the turn order and tokens
