@@ -41,6 +41,12 @@ def update_plots(show_result=False):
         trackers.wins_mean.append(sum(trackers.wins[-100:])/100)
         plt.plot(trackers.x[99:],trackers.wins_mean, label='win rate (mean)')
 
+        last_mean = trackers.wins_mean[-1]
+        plt.plot([0, len(trackers.x) - 1], [last_mean, last_mean], color='k', linestyle='--')
+        plt.text(len(trackers.x) - 1, last_mean + 3, f'{last_mean:.2f} %', ha='right', va='center', color='k')
+
+
+
     plt.ylim(0,100)
     plt.legend()
     plt.pause(0.001)
