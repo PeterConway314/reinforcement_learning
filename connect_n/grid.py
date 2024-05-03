@@ -98,7 +98,6 @@ class Grid:
         start = x-self.grid_helpers[x][y][0]
         end = x+self.grid_helpers[x][y][2]
         nx = (end - start + 2) - self.n
-        print(f"{self.grid_helpers[x][y][0]}")
         for i in range(nx):
             if self.is_win(self.grid[start+i:start+i+self.n,y],self.n):
                 return True
