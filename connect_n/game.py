@@ -30,7 +30,7 @@ class Game:
                 self.grid.register_move(tokens[i], move)
                 clear_screen()
                 self.grid.display()
-                if self.grid.has_winner():
+                if self.grid.has_winner:
                     return print("{} wins!".format(tokens[i]))
                 if not self.grid.get_valid_moves():
                     return print("draw.")
@@ -76,7 +76,7 @@ class TrainingGame(Game):
         while True: # while not finished
             for i in [0, 1]: # cycle through agents
                 self.move_cycle(i) # make move
-                if self.grid.has_winner(): # if winner
+                if self.grid.has_winner: # if winner
                     self.update_q_value(i,reward=1) # reward winner
                     self.update_q_value(np.mod(i+1,2),reward=-1) # penalise loser
                     if self.agents[i] == self.agent1: # get return value

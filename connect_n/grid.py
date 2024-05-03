@@ -38,6 +38,21 @@ class Grid:
         self.grid = np.array([[null for _ in range(self.ydim)] \
                                     for _ in range(self.xdim)])
         self.grid_counts = np.array([0 for _ in range(self.xdim)])
+        self.init_grid_helpers()
+        self.has_winner = False
+
+    def init_grid_helpers(self):
+        # grid helpers count extent in each direction
+        self.grid_helpers = np.array([[[None for _ in range(4)] \
+                                             for _ in range(self.ydim)] \
+                                             for _ in range(self.xdim)])
+        for i in range(self.xdim):
+            for j in range(self.ydim):
+                self.grid_helpers[i][j][0] = min(i, self.n-1) # west
+                self.grid_helpers[i][j][2] = min(self.xdim-i-1, self.n-1) # east
+                self.grid_helpers[i][j][1] = min(self.ydim-j-1, self.n-1) # north
+                self.grid_helpers[i][j][3] = min(j, self.n-1) # south
+
 
     def reset_grid(self):
         self.grid *= 0
@@ -55,46 +70,69 @@ class Grid:
         if self.is_valid_move(x):
             self.grid_counts[x] += 1
             self.grid[x][self.grid_counts[x]-1] = move_map[token]
+            self.has_winner = self.check_for_winner(x,self.grid_counts[x]-1)
         else:
             print("invalid move.")
 
     def is_win(self,lst,len):
         # determines if a list is all the same and not 0s
-        if lst[0] == 0:
+        if lst[len-1] == 0: # check first element
+            return False
+        if lst[0] == 0: # check last element
             return False
         for i in range(1,len):
             if lst[i] != lst[0]:
                 return False
         return True
-
-    def has_winner(self):
+    
+    def check_for_winner(self,x,y):
         # vertical wins
-        nx = self.xdim - self.n + 1 # row "freedom"
-        ny = self.ydim - self.n + 1 # column "freedom"
-        for j in range(ny):
-            for i in range(self.xdim):
-                if self.is_win(self.grid[i,j:j+self.n],self.n):
-                    return True
+        start = y-self.grid_helpers[x][y][3]
+        end = y+self.grid_helpers[x][y][1]
+        ny = (end - start + 2) - self.n
+        for i in range(ny):
+            if self.is_win(self.grid[x,start+i:start+i+self.n],self.n):
+                return True
+
         # horizontal wins
-        for j in range(self.ydim):
-            for i in range(nx):
-                if self.is_win(self.grid[i:i+self.n,j],self.n):
-                    return True
-        # diagonal wins
-        for i in range(1-nx,ny):
-            # south-west to north-east wins
-            list = self.grid.diagonal(i) # get diagonal
-            nd = len(list) - self.n # diagonal "freedom"
-            for j in range(nd+1):
-                if self.is_win(list[j:j+self.n],self.n):
-                    return True
-            # south-east to north-west wins
-            list = np.flipud(self.grid).diagonal(i) # get diagonal
-            nd = len(list) - self.n # diagonal "freedom"
-            for j in range(nd+1):
-                if self.is_win(list[j:j+self.n],self.n):
-                    return True
-        return False
+        start = x-self.grid_helpers[x][y][0]
+        end = x+self.grid_helpers[x][y][2]
+        nx = (end - start + 2) - self.n
+        print(f"{self.grid_helpers[x][y][0]}")
+        for i in range(nx):
+            if self.is_win(self.grid[start+i:start+i+self.n,y],self.n):
+                return True
+
+        # sw-ne diagonal wins
+        list = self.grid.diagonal(0) # get diagonal
+        offset = y-x
+        list = self.grid.diagonal(offset) # get diagonal
+        if offset < 0:
+            pos = y
+        else:
+            pos = x
+        start = pos - min(self.grid_helpers[x][y][0],self.grid_helpers[x][y][3])
+        end = pos + min(self.grid_helpers[x][y][1],self.grid_helpers[x][y][2])
+        nd = (end - start + 2) - self.n
+        for i in range(nd):
+            if self.is_win(list[start+i:start+i+self.n],self.n):
+                return True
+
+        # se-nw diagonal wins
+        offset = y-(self.xdim-x-1)
+        list = np.flipud(self.grid).diagonal(offset) # get diagonal
+        if offset < 0:
+            pos = y
+        else:
+            pos = self.xdim - x - 1
+        start = pos - min(self.grid_helpers[x][y][2],self.grid_helpers[x][y][3])
+        end = pos + min(self.grid_helpers[x][y][1],self.grid_helpers[x][y][0])
+        nd = (end - start + 2) - self.n
+        for i in range(nd):
+            if self.is_win(list[start+i:start+i+self.n],self.n):
+                return True    
+
+        return False        
 
     def display(self):
         header = ""
