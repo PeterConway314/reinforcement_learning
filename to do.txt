@@ -1,0 +1,8 @@
+- pick a coordinate system and use it universally
+- write the project readme
+    => explain that you should run main.py from the game subfolders
+- implement a reinforcement-learning agent!
+- figure out how to import utils nicely
+- make a consts module?
+- write a plotter class for displaying training data
+- accept input params in main.go to handle stuff (also write a --help command)

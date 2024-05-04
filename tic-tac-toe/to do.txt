@@ -1,4 +1,0 @@
-- we need to be able to detect a draw
-- pick a coordinate system and use it universally
-- write the project readme
-- implement a reinforcement-learning agent!

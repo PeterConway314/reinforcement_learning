@@ -1,36 +1,45 @@
 import random
-import os
+import sys
+sys.path.append("../utils/")
+from utils import clear_screen
 
-tokens = ["O", "X"]
-
-def clear_screen():
-    # Clear command for Windows
-    if os.name == 'nt':
-        os.system('cls')
-    # Clear command for Unix-like systems (Linux, macOS)
-    else:
-        os.system('clear')
+tokens = ["X", "O"]
 
 class Game:
     def __init__(self, board, agent1, agent2):
         self.board = board
         self.agent1 = agent1
         self.agent2 = agent2
-        self.turn_order = random.sample([agent1, agent2], 2)
+        self.randomise_move_order()
 
-    def swap_turn(self):
-        if self.active_agent == self.agent1:
-            return self.agent2
-        return self.agent1
+    def randomise_move_order(self):
+        self.turn_order = random.sample([self.agent1, self.agent2], 2)
+        self.agent_token_map = {
+            self.turn_order[0]: tokens[0],
+            self.turn_order[1]: tokens[1]
+        }
 
-    def play_game(self):
+    def game_step(self, agent):
+        move = agent.select_move(self.board.get_valid_moves())
+        self.board.register_move(self.agent_token_map[agent], move[0], move[1])
+
+    def play(self):
         while True:
             for i, agent in enumerate(self.turn_order):
-                move = agent.select_move(self.board.get_valid_moves())
-                self.board.register_move(tokens[i], move[0], move[1])
+                self.game_step(agent)
                 clear_screen()
                 self.board.display()
+
                 if self.board.has_winner():
                     return "{} wins!".format(tokens[i])
                 if not self.board.get_valid_moves():
                     return "draw."
+
+    def train(self, episodes):
+        wins = 0
+        draws = 0
+        losses = 0
+
+        for episode in range(episodes):
+            print("{}/{}".format(episode, episodes))
+            pass
